@@ -1,6 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function Modal({ onClose, children }) {
+
+  useEffect(() => {                      // Here we added useEffect because window is browser sideEffect and for sideEffect we added useEffect
+    const handleEsc = (e) => {            // if we add just event handler only then it will causes re-render loop 
+      if (e.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleEsc);    
+    return () => window.removeEventListener("keydown", handleEsc);    // this cleanup function stop Memory Leak, Unexpected Behaviour
+  }, [onClose]);
+  
   return (
     <div
       onClick={onClose}
@@ -14,8 +24,8 @@ function Modal({ onClose, children }) {
       }}
     >
       <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
+        onClick={(e) => e.stopPropagation()}     // Here we add stoppropagation because to stop the bubble Phase if we click on this div then it will bubble up to parent,  
+        style={{                                 // and calls that onClose function then pop up modal will close that why we added here to stop that phase
           background: "#fff",
           padding: 20,
           borderRadius: 6,
